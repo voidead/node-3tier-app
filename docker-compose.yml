@@ -1,0 +1,43 @@
+version: '3'
+services:
+
+  api:
+    build: ./api
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: 8080
+      DB: 'postgres://api_user:mysecretpassword@db-internal.linuxtweaks.in/api'
+    networks:
+      mynetwork:
+        aliases:
+          - api-app.linuxtweaks.in
+  
+  web:
+    build: ./web
+    ports:
+      - "80:80"
+    environment:
+      PORT: 80
+      API_HOST: http://api-app.linuxtweaks.in:8080
+    networks:
+      mynetwork:
+        aliases:
+          - web-app.linuxtweaks.in
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: 'mysecretpassword'
+      POSTGRES_USER: api_user
+      POSTGRES_DB: api
+    ports:
+      - "5432:5432"
+    networks:
+      mynetwork:
+        aliases:
+          - db-internal.linuxtweaks.in
+
+networks:
+  mynetwork:
+    driver: bridge 
